@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5a2cf83212541ba4884ecc0f6298b73c
+guid: 4f8505136447ee440bde0730cfddf497
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -33,11 +33,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: stop_walking
+      name: idle_breathing
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 113
+      lastFrame: 210
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
