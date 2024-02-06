@@ -565,7 +565,7 @@ ModelImporter:
       parentName: elizabeth(Clone)
       position: {x: 0.0014611431, y: 1.0227429, z: -0.012459165}
       rotation: {x: -0, y: -0, z: -0.000000002910383, w: 1}
-      scale: {x: 1, y: 1, z: 0.99999994}
+      scale: {x: 1, y: 0.89693, z: 0.99999994}
     - name: mixamorig1:LeftUpLeg
       parentName: mixamorig1:Hips
       position: {x: -0.09463114, y: -0.049896393, z: -0.00016765356}

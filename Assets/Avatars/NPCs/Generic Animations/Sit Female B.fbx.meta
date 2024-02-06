@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8bfbd781c8694cf44b8214e59a091150
+guid: ff6c38577b30aa248a6d673f1f6c1f32
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
@@ -33,11 +33,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: mixamo.com
+      name: Sit Female B
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 574
+      lastFrame: 552
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
