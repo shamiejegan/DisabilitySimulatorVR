@@ -67,7 +67,7 @@ public class ASDIntroController : MonoBehaviour
     {
         Debug.Log("StartASDSimulation");
         //change scene to the next scene
-        SceneManager.LoadScene("Simulation");
+        SceneManager.LoadScene("ASD");
     }
 
 }
