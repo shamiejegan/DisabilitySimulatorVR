@@ -17,6 +17,8 @@ public class ConfigController : MonoBehaviour
 
     [SerializeField] float configCountdownTimer = 6.0f;
 
+    [SerializeField] string nextScene = "02_Introduction";
+
     //default player preference configurations
     private string gender = "Female";
     private string mode = "Sitting";
@@ -109,7 +111,7 @@ public class ConfigController : MonoBehaviour
         Debug.Log("Gender: " +  gender);
 
         // Switch to the next scene
-        SceneManager.LoadScene("Introduction");
+        SceneManager.LoadScene(nextScene);
 
     }
 }

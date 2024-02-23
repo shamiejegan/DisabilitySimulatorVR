@@ -703,6 +703,7 @@ MonoBehaviour:
   modeSelectionUI: {fileID: 607426411}
   heightConfigurationUI: {fileID: 1741887779}
   configCountdownTimer: 5
+  nextScene: 02_Introduction
 --- !u!4 &410643389
 Transform:
   m_ObjectHideFlags: 0
