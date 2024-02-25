@@ -8,13 +8,18 @@ public class ActivityController : MonoBehaviour
 {
     [Header("Instructor")]
     [SerializeField] GameObject instructor;
-    [SerializeField] AudioClip[] instructorAudioClips; 
+    [SerializeField] AudioClip[] instructorAudioClips;
     private AudioSource instructorAudioSource;
     private Animator instructorAnimator;
 
-    [Header("Inner Monologue")]
-    [SerializeField] AudioClip[] innerMonologueAudioClips;
+    [Header("Inner Monologues")]
+    [SerializeField] GameObject innerMonologue_M;
+    [SerializeField] AudioClip[] innerMonologueAudioClips_M;
+
+    [SerializeField] GameObject innerMonologue_F;
+    [SerializeField] AudioClip[] innerMonologueAudioClips_F;
     private AudioSource innerMonologueAudioSource;
+    private AudioClip[] innerMonologueAudioClips;
 
     [Header("Cards")]
     [SerializeField] string[] countryList;
@@ -27,19 +32,19 @@ public class ActivityController : MonoBehaviour
 
     [Header("NPCs")]
     [SerializeField] GameObject[] npcs;
-    [SerializeField] AudioClip[] npcAudioClips; 
+    [SerializeField] AudioClip[] npcAudioClips;
     private int randomIndex;
 
     [Header("GameScore")]
     public int score_without_mitigation = 0;
     public int score_with_mitigation = 0;
-    
+
     [Header("Timers")]
     private int groupFinderTimer = 30;
     private int roundTimer = 10;
-    [SerializeField] GameObject timerAudio; 
+    [SerializeField] GameObject timerAudio;
     private AudioSource timerAudioClip;
-    [SerializeField] GameObject timerEndedAudio; 
+    [SerializeField] GameObject timerEndedAudio;
     private AudioSource timerEndedAudioClip;
 
     [Header("Mitigation Tools")]
@@ -49,10 +54,22 @@ public class ActivityController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Get the AudioSource and animator components of instructor
-        instructorAudioSource = instructor.GetComponent<AudioSource>();
+        // Get animator components 
         instructorAnimator = instructor.GetComponent<Animator>();
-        innerMonologueAudioSource = instructor.GetComponent<AudioSource>();
+
+        //Get audio components
+        instructorAudioSource = instructor.GetComponent<AudioSource>();
+        // assign inner monologue audio based on gender of user 
+        if (PlayerPrefs.GetString("Gender") == "Male")
+        {
+            innerMonologueAudioSource = innerMonologue_M.GetComponent<AudioSource>();
+            innerMonologueAudioClips = innerMonologueAudioClips_M;
+        }
+        else
+        {
+            innerMonologueAudioSource = innerMonologue_F.GetComponent<AudioSource>();
+            innerMonologueAudioClips = innerMonologueAudioClips_F;
+        }
 
 
         //hide all card game objects
@@ -97,14 +114,19 @@ public class ActivityController : MonoBehaviour
         StartCoroutine(GameBriefing());
     }
 
-    private IEnumerator GameBriefing() 
+    private IEnumerator GameBriefing()
     {
         Debug.Log("Game Briefing");
         instructorAnimator.SetBool("GameBriefing", true);
         instructorAnimator.SetBool("Start", false);
         PlayInstructorAudioClip(0);
-        // find duration of instructor audio clip and wait for that duration before starting the next coroutine
-        yield return new WaitForSeconds(instructorAudioSource.clip.length);
+        // find duration of instructor audio clip and wait for that duration
+        //start next coroutine 1 second before prevent too much silence between
+        yield return new WaitForSeconds(instructorAudioSource.clip.length -1);
+        PlayInnerMonologueAudioClip(index:0, loop: false);
+        instructorAnimator.SetBool("InnerMonologueOn", true);
+        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1);
+        instructorAnimator.SetBool("InnerMonologueOn", false);
         StartCoroutine(GroupingBriefing());
     }
 
@@ -114,8 +136,13 @@ public class ActivityController : MonoBehaviour
         instructorAnimator.SetBool("GroupBriefing", true);
         instructorAnimator.SetBool("GameBriefing", false);
         PlayInstructorAudioClip(1);
-        // find duration of instructor audio clip and wait for that duration before starting the next coroutine
-        yield return new WaitForSeconds(instructorAudioSource.clip.length);
+        // find duration of instructor audio clip and wait for that duration before playing inner monologue audio clip
+        yield return new WaitForSeconds(instructorAudioSource.clip.length-1);
+        PlayInnerMonologueAudioClip(1, loop: false);
+        instructorAnimator.SetBool("InnerMonologueOn", true);
+        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1);
+        StopInnerMonologueAudioClip();
+        instructorAnimator.SetBool("InnerMonologueOn", false);
         StartCoroutine(FindingGroup());
     }
 
@@ -125,7 +152,10 @@ public class ActivityController : MonoBehaviour
         instructorAnimator.SetBool("FindingGroup", true);
         instructorAnimator.SetBool("GroupBriefing", false);
         PlayNPCAudioClips(8.0f);
-
+        instructorAnimator.SetBool("InnerMonologueOn", true);
+        PlayInnerMonologueAudioClip(index: 2, loop: false);
+        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1);
+        PlayInnerMonologueAudioClip(index: 3, loop: true);
         foreach (GameObject canvasItem in canvasItems)
         {
             canvasItem.SetActive(true);
@@ -140,13 +170,13 @@ public class ActivityController : MonoBehaviour
 
         //begin countdown timer for group finding
         int timer = groupFinderTimer;
-        while (timer >=0)
+        while (timer >= 0)
         {
             // update time left on screens
             foreach (GameObject canvasTimer in canvasTimers)
             {
                 canvasTimer.GetComponent<TextMeshProUGUI>().text = timer.ToString();
-            
+
             }
             PlayTimerAudioClip();
             timer--;
@@ -154,7 +184,7 @@ public class ActivityController : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         PlayTimerEndedClip();
-        yield return new WaitForSeconds(1);
+        StopInnerMonologueAudioClip();
         StopNPCAudioClips(5.0f);
         StartCoroutine(StartActivity());
     }
@@ -164,9 +194,13 @@ public class ActivityController : MonoBehaviour
         Debug.Log("Start Activity");
         instructorAnimator.SetBool("StartActivity", true);
         instructorAnimator.SetBool("FindingGroup", false);
+        instructorAnimator.SetBool("InnerMonologueOn", false);
         PlayInstructorAudioClip(2);
+        yield return new WaitForSeconds(instructorAudioSource.clip.length-1); 
         // find duration of instructor audio clip and wait for that duration before starting the next coroutine
-        yield return new WaitForSeconds(instructorAudioSource.clip.length);
+        instructorAnimator.SetBool("InnerMonologueOn", true);
+        PlayInnerMonologueAudioClip(index: 4, loop: false);
+        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1); 
         StartCoroutine(ActivityStart());
     }
 
@@ -176,7 +210,7 @@ public class ActivityController : MonoBehaviour
         instructorAnimator.SetBool("ActivityStarted", true);
         instructorAnimator.SetBool("StartActivity", false);
         PlayNPCAudioClips(3.0f);
-        
+
         //start activity without mitigation
         cards.SetActive(true);
 
@@ -187,10 +221,10 @@ public class ActivityController : MonoBehaviour
             {
                 canvasItem.GetComponent<TextMeshProUGUI>().text = country;
             }
-            
+
             //begin countdown timer for each round in activity, reset with each country in list
             int timer = roundTimer;
-            while (timer >=0)
+            while (timer >= 0)
             {
                 foreach (GameObject canvasTimer in canvasTimers)
                 {
@@ -222,13 +256,13 @@ public class ActivityController : MonoBehaviour
         while (headphonesSelected == false || shadesSelected == false)
         {
 
-            PlayInnerMonologueAudioClips(0);
-            yield return new WaitForSeconds(instructorAudioSource.clip.length +1);
+            PlayInnerMonologueAudioClip(index: 6, loop: false);
+            yield return new WaitForSeconds(instructorAudioSource.clip.length + 1);
             // This will only be triggered 1 second after the last inner monologue audio clip has finished playing
-            if(headphonesSelected == true)
+            if (headphonesSelected == true)
             {
                 StopNPCAudioClips(2.0f);
-                StopInnerMonologueAudioClips();
+                StopInnerMonologueAudioClip();
             }
         }
         // TODO: if both mitigation tools are selected, ensure audio is stopped and lights are no longer glaring  
@@ -259,11 +293,12 @@ public class ActivityController : MonoBehaviour
         }
     }
 
-    public void PlayInnerMonologueAudioClips(int index)
+    public void PlayInnerMonologueAudioClip(int index, bool loop = false)
     {
         if (index >= 0 && index < innerMonologueAudioClips.Length)
         {
-            innerMonologueAudioSource.clip =  innerMonologueAudioClips[index];
+            innerMonologueAudioSource.clip = innerMonologueAudioClips[index];
+            innerMonologueAudioSource.loop = loop;
             innerMonologueAudioSource.Play();
         }
         else
@@ -272,12 +307,12 @@ public class ActivityController : MonoBehaviour
         }
     }
 
-    public void StopInnerMonologueAudioClips()
+    public void StopInnerMonologueAudioClip()
     {
-        innerMonologueAudioSource.Stop(); 
+        innerMonologueAudioSource.Stop();
     }
 
-    public void PlayNPCAudioClips(float fadeTime=5.0f)
+    public void PlayNPCAudioClips(float fadeTime = 5.0f)
     {
         Debug.Log("Play NPC Audio Clips");
         //for each npc, play a random audio clip from the array npcAudioClips, clips will loop but are of different lengths so they will not be in sync, creating a more natural sound
@@ -289,7 +324,7 @@ public class ActivityController : MonoBehaviour
             StartCoroutine(FadeIn(npc.GetComponent<AudioSource>(), fadeTime));
         }
     }
-    public void StopNPCAudioClips(float fadeTime=5.0f)
+    public void StopNPCAudioClips(float fadeTime = 5.0f)
     {
         Debug.Log("Stop NPC Audio Clips");
         //for each npc, play a random audio clip from the array npcAudioClips
@@ -324,4 +359,5 @@ public class ActivityController : MonoBehaviour
         }
         audioSource.volume = startVolume;
     }
+
 }
