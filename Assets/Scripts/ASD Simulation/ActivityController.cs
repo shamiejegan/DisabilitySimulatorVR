@@ -67,8 +67,8 @@ public class ActivityController : MonoBehaviour
         }
         else
         {
-            innerMonologueAudioSource = innerMonologue_M.GetComponent<AudioSource>();
-            innerMonologueAudioClips = innerMonologueAudioClips_M;
+            innerMonologueAudioSource = innerMonologue_F.GetComponent<AudioSource>();
+            innerMonologueAudioClips = innerMonologueAudioClips_F;
         }
 
 
