@@ -67,8 +67,8 @@ public class ActivityController : MonoBehaviour
         }
         else
         {
-            innerMonologueAudioSource = innerMonologue_F.GetComponent<AudioSource>();
-            innerMonologueAudioClips = innerMonologueAudioClips_F;
+            innerMonologueAudioSource = innerMonologue_M.GetComponent<AudioSource>();
+            innerMonologueAudioClips = innerMonologueAudioClips_M;
         }
 
 
@@ -141,7 +141,6 @@ public class ActivityController : MonoBehaviour
         PlayInnerMonologueAudioClip(1, loop: false);
         instructorAnimator.SetBool("InnerMonologueOn", true);
         yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1);
-        StopInnerMonologueAudioClip();
         instructorAnimator.SetBool("InnerMonologueOn", false);
         StartCoroutine(FindingGroup());
     }
@@ -154,7 +153,7 @@ public class ActivityController : MonoBehaviour
         PlayNPCAudioClips(8.0f);
         instructorAnimator.SetBool("InnerMonologueOn", true);
         PlayInnerMonologueAudioClip(index: 2, loop: false);
-        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1);
+        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length);
         PlayInnerMonologueAudioClip(index: 3, loop: true);
         foreach (GameObject canvasItem in canvasItems)
         {
@@ -192,15 +191,15 @@ public class ActivityController : MonoBehaviour
     private IEnumerator StartActivity()
     {
         Debug.Log("Start Activity");
+        // find duration of instructor audio clip and wait for that duration before starting the next coroutine
+        instructorAnimator.SetBool("InnerMonologueOn", true);
+        PlayInnerMonologueAudioClip(index: 4, loop: false);
+        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1); 
         instructorAnimator.SetBool("StartActivity", true);
         instructorAnimator.SetBool("FindingGroup", false);
         instructorAnimator.SetBool("InnerMonologueOn", false);
         PlayInstructorAudioClip(2);
         yield return new WaitForSeconds(instructorAudioSource.clip.length-1); 
-        // find duration of instructor audio clip and wait for that duration before starting the next coroutine
-        instructorAnimator.SetBool("InnerMonologueOn", true);
-        PlayInnerMonologueAudioClip(index: 4, loop: false);
-        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1); 
         StartCoroutine(ActivityStart());
     }
 
@@ -322,6 +321,8 @@ public class ActivityController : MonoBehaviour
             npc.GetComponent<AudioSource>().clip = npcAudioClips[randomIndex];
             //gradually increase volume of audio clip over 5 seconds
             StartCoroutine(FadeIn(npc.GetComponent<AudioSource>(), fadeTime));
+            //fade out background audio
+            StartCoroutine(FadeOut(GetComponent<AudioSource>(), 10.0f));
         }
     }
     public void StopNPCAudioClips(float fadeTime = 5.0f)
@@ -333,6 +334,9 @@ public class ActivityController : MonoBehaviour
             //gradually reduce volume of audio clip over 5 seconds
             StartCoroutine(FadeOut(npc.GetComponent<AudioSource>(), fadeTime));
         }
+        //fade background audio back in 
+        StartCoroutine(FadeIn(GetComponent<AudioSource>(), fadeTime));
+
     }
 
     public IEnumerator FadeOut(AudioSource audioSource, float FadeTime)
