@@ -14,9 +14,26 @@ public class ButtonToMapLinking : MonoBehaviour
         mapImage = map.GetComponent<Image>();
     }
 
-    void ColorOnHover()
+    public void ColorOnSelect()
     {
-        // set image color to blue   
-        mapImage.color = Color.blue;
+        //start coroutine to determine if the country name matches the country for the activity and change the color of the map to green if correct, and red if false
+        StartCoroutine(CheckCountry());
     }
+
+    IEnumerator CheckCountry()
+    {
+        // wait for 1 second
+        yield return new WaitForSeconds(1);
+        // if the country name matches the country for the activity
+        if (mapImage.sprite.name == gameObject.name)
+        {
+            // set image color to green
+            mapImage.color = Color.green;
+        }
+        else
+        {
+            // set image color to red
+            mapImage.color = Color.red;
+        }
+    }   
 }
