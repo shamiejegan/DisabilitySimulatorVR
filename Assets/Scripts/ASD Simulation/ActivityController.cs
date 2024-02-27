@@ -41,6 +41,7 @@ public class ActivityController : MonoBehaviour
     [Header("NPCs")]
     [SerializeField] GameObject[] npcs;
     [SerializeField] AudioClip[] npcAudioClips;
+    [SerializeField] Vector3[] npcTargetRotations;
     private int randomIndex;
 
     [Header("GameScore")]
@@ -67,22 +68,9 @@ public class ActivityController : MonoBehaviour
 
         //Get audio components
         instructorAudioSource = instructor.GetComponent<AudioSource>();
-        // assign inner monologue audio based on gender of user 
-        if (PlayerPrefs.GetString("gender") == "Male")
-        {
-            innerMonologueAudioSource = innerMonologue_M.GetComponent<AudioSource>();
-            innerMonologueAudioClips = innerMonologueAudioClips_M;
-        }
-        else
-        {
-            // default will be female
-            innerMonologueAudioSource = innerMonologue_F.GetComponent<AudioSource>();
-            innerMonologueAudioClips = innerMonologueAudioClips_F;
-        }
 
         //start without light particles 
         particleLights.SetActive(false);
-        //hide all card game objects
 
         //Initialise canvas objects (array for both left and right screens)
         foreach (GameObject canvasTitle in canvasTitles)
@@ -98,6 +86,17 @@ public class ActivityController : MonoBehaviour
             canvasItem.SetActive(false);
         }
 
+        //Initialise inner monologue audio source and clips based on player gender
+        if (PlayerPrefs.GetString("gender")=="Male")
+        {
+            innerMonologueAudioSource = innerMonologue_M.GetComponent<AudioSource>();
+            innerMonologueAudioClips = innerMonologueAudioClips_M;
+        }
+        else
+        {
+            innerMonologueAudioSource = innerMonologue_F.GetComponent<AudioSource>();
+            innerMonologueAudioClips = innerMonologueAudioClips_F;
+        }
         //Assign timer audios
         timerAudioClip = timerAudio.GetComponent<AudioSource>();
         timerEndedAudioClip = timerEndedAudio.GetComponent<AudioSource>();
@@ -264,7 +263,7 @@ public class ActivityController : MonoBehaviour
             if (headphonesSelected == true)
             {
                 StopNPCAudioClips(2.0f);
-                StopInnerMonologueAudioClip();
+                // StopInnerMonologueAudioClip();
             }
             if (shadesSelected == true)
             {
@@ -330,6 +329,11 @@ public class ActivityController : MonoBehaviour
             StartCoroutine(FadeIn(npc.GetComponent<AudioSource>(), fadeTime));
             //fade out background audio
             StartCoroutine(FadeOut(GetComponent<AudioSource>(), 10.0f));
+        }
+        //rotate npcs to target rotations
+        for (int i = 0; i < npcs.Length; i++)
+        {
+            npcs[i].transform.eulerAngles = npcTargetRotations[i];
         }
     }
     public void StopNPCAudioClips(float fadeTime = 5.0f)
