@@ -60,20 +60,21 @@ public class ActivityController : MonoBehaviour
         //Get audio components
         instructorAudioSource = instructor.GetComponent<AudioSource>();
         // assign inner monologue audio based on gender of user 
-        if (PlayerPrefs.GetString("Gender") == "Male")
+        if (PlayerPrefs.GetString("gender") == "Male")
         {
             innerMonologueAudioSource = innerMonologue_M.GetComponent<AudioSource>();
             innerMonologueAudioClips = innerMonologueAudioClips_M;
         }
         else
         {
+            // default will be female
             innerMonologueAudioSource = innerMonologue_F.GetComponent<AudioSource>();
             innerMonologueAudioClips = innerMonologueAudioClips_F;
         }
 
 
         //hide all card game objects
-        cards.SetActive(false);
+        cards.SetActive(true);
 
         //Initialise canvas objects (array for both left and right screens)
         foreach (GameObject canvasTitle in canvasTitles)
