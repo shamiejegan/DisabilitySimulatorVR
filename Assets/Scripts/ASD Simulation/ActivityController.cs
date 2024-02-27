@@ -131,10 +131,10 @@ public class ActivityController : MonoBehaviour
         PlayInstructorAudioClip(0);
         // find duration of instructor audio clip and wait for that duration
         //start next coroutine 1 second before prevent too much silence between
-        yield return new WaitForSeconds(instructorAudioSource.clip.length - 1);
-        PlayInnerMonologueAudioClip(index: 0, loop: false);
-        instructorAnimator.SetBool("InnerMonologueOn", true);
-        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length - 1);
+        yield return new WaitForSeconds(instructorAudioSource.clip.length);
+        // PlayInnerMonologueAudioClip(index: 0, loop: false);
+        // instructorAnimator.SetBool("InnerMonologueOn", true);
+        // yield return new WaitForSeconds(innerMonologueAudioSource.clip.length);
         instructorAnimator.SetBool("InnerMonologueOn", false);
         StartCoroutine(GroupingBriefing());
     }
@@ -146,11 +146,11 @@ public class ActivityController : MonoBehaviour
         instructorAnimator.SetBool("GameBriefing", false);
         PlayInstructorAudioClip(1);
         // find duration of instructor audio clip and wait for that duration before playing inner monologue audio clip
-        yield return new WaitForSeconds(instructorAudioSource.clip.length - 1);
-        PlayInnerMonologueAudioClip(1, loop: false);
-        instructorAnimator.SetBool("InnerMonologueOn", true);
-        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length - 1);
-        instructorAnimator.SetBool("InnerMonologueOn", false);
+        yield return new WaitForSeconds(instructorAudioSource.clip.length);
+        // PlayInnerMonologueAudioClip(1, loop: false);
+        // instructorAnimator.SetBool("InnerMonologueOn", true);
+        // yield return new WaitForSeconds(innerMonologueAudioSource.clip.length - 1);
+        // instructorAnimator.SetBool("InnerMonologueOn", false);
         StartCoroutine(FindingGroup());
         StartCoroutine(TurnOnLights());
     }
@@ -193,7 +193,7 @@ public class ActivityController : MonoBehaviour
         }
         PlayTimerEndedClip();
         StopInnerMonologueAudioClip();
-        StopNPCAudioClips(5.0f);
+        StopNPCAudioClips(10.0f);
         StartCoroutine(StartActivity());
     }
 
