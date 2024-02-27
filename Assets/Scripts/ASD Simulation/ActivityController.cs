@@ -21,6 +21,14 @@ public class ActivityController : MonoBehaviour
     private AudioSource innerMonologueAudioSource;
     private AudioClip[] innerMonologueAudioClips;
 
+    [Header("Lights")]
+    [SerializeField] GameObject sphereLights;
+    [SerializeField] GameObject particleLights;
+    [SerializeField] GameObject flareView;
+    private int maxIntensity = 1;
+    private float intensityIncreaseRate = 0.05f;
+    private bool lightsOn = false; //to determine if the lights should be turned on or off so that the coroutines activated can be stopped
+
     [Header("Cards")]
     [SerializeField] string[] countryList;
     [SerializeField] GameObject cards;
@@ -72,7 +80,8 @@ public class ActivityController : MonoBehaviour
             innerMonologueAudioClips = innerMonologueAudioClips_F;
         }
 
-
+        //start without light particles 
+        particleLights.SetActive(false);
         //hide all card game objects
         cards.SetActive(true);
 
@@ -123,10 +132,10 @@ public class ActivityController : MonoBehaviour
         PlayInstructorAudioClip(0);
         // find duration of instructor audio clip and wait for that duration
         //start next coroutine 1 second before prevent too much silence between
-        yield return new WaitForSeconds(instructorAudioSource.clip.length -1);
-        PlayInnerMonologueAudioClip(index:0, loop: false);
+        yield return new WaitForSeconds(instructorAudioSource.clip.length - 1);
+        PlayInnerMonologueAudioClip(index: 0, loop: false);
         instructorAnimator.SetBool("InnerMonologueOn", true);
-        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1);
+        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length - 1);
         instructorAnimator.SetBool("InnerMonologueOn", false);
         StartCoroutine(GroupingBriefing());
     }
@@ -138,12 +147,13 @@ public class ActivityController : MonoBehaviour
         instructorAnimator.SetBool("GameBriefing", false);
         PlayInstructorAudioClip(1);
         // find duration of instructor audio clip and wait for that duration before playing inner monologue audio clip
-        yield return new WaitForSeconds(instructorAudioSource.clip.length-1);
+        yield return new WaitForSeconds(instructorAudioSource.clip.length - 1);
         PlayInnerMonologueAudioClip(1, loop: false);
         instructorAnimator.SetBool("InnerMonologueOn", true);
-        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1);
+        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length - 1);
         instructorAnimator.SetBool("InnerMonologueOn", false);
         StartCoroutine(FindingGroup());
+        StartCoroutine(TurnOnLights());
     }
 
     private IEnumerator FindingGroup()
@@ -160,7 +170,6 @@ public class ActivityController : MonoBehaviour
         {
             canvasItem.SetActive(true);
             canvasItem.GetComponent<TextMeshProUGUI>().text = "ACTIVITY STARTS IN...";
-
         }
         foreach (GameObject canvasTimer in canvasTimers)
         {
@@ -195,12 +204,12 @@ public class ActivityController : MonoBehaviour
         // find duration of instructor audio clip and wait for that duration before starting the next coroutine
         instructorAnimator.SetBool("InnerMonologueOn", true);
         PlayInnerMonologueAudioClip(index: 4, loop: false);
-        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length-1); 
+        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length - 1);
         instructorAnimator.SetBool("StartActivity", true);
         instructorAnimator.SetBool("FindingGroup", false);
         instructorAnimator.SetBool("InnerMonologueOn", false);
         PlayInstructorAudioClip(2);
-        yield return new WaitForSeconds(instructorAudioSource.clip.length-1); 
+        yield return new WaitForSeconds(instructorAudioSource.clip.length - 1);
         StartCoroutine(ActivityStart());
     }
 
@@ -241,7 +250,7 @@ public class ActivityController : MonoBehaviour
             //trigger select mitigation inner monologue until both mitigation tools are selected from the 5th country
             if (country == countryList[4])
             {
-                StartCoroutine(SelectMitigation());
+                SelectMitigation(); 
             }
 
             yield return new WaitForSeconds(1);
@@ -249,20 +258,20 @@ public class ActivityController : MonoBehaviour
         }
     }
 
-    private IEnumerator SelectMitigation()
+    private void SelectMitigation()
     {
-        Debug.Log("Select Mitigation Inner Monologue");
         // repeat the inner monologue audio clip to grab mitigation tools with 2 second delay until the player selects them both
         while (headphonesSelected == false || shadesSelected == false)
         {
-
-            PlayInnerMonologueAudioClip(index: 6, loop: false);
-            yield return new WaitForSeconds(instructorAudioSource.clip.length + 1);
             // This will only be triggered 1 second after the last inner monologue audio clip has finished playing
             if (headphonesSelected == true)
             {
                 StopNPCAudioClips(2.0f);
                 StopInnerMonologueAudioClip();
+            }
+            if (shadesSelected == true)
+            {
+                StartCoroutine(TurnOffLights());
             }
         }
         // TODO: if both mitigation tools are selected, ensure audio is stopped and lights are no longer glaring  
@@ -364,5 +373,115 @@ public class ActivityController : MonoBehaviour
         }
         audioSource.volume = startVolume;
     }
+
+    public IEnumerator TurnOnLights()
+    {
+        lightsOn = true;
+        //turn particle lights on 
+        particleLights.SetActive(true);
+
+        //turn sphere lights on
+        while (lightsOn)
+        {
+            // Iterate through each child of "sphereLights"
+            for (int i = 0; i < sphereLights.transform.childCount; i++)
+            {
+                Transform child = sphereLights.transform.GetChild(i);
+                Renderer renderer = child.GetComponent<Renderer>();
+                Material[] materials = renderer.materials;
+                foreach (Material mat in materials)
+                {
+                    Color currentEmission = mat.GetColor("_EmissionColor");
+                    
+                    if (currentEmission.r <= maxIntensity) // increase intensity have the time
+                    {
+                        if (Random.value > 0.5f)
+                        {
+                            // increase the intensity 
+                            float newIntensity = currentEmission.r + intensityIncreaseRate;
+                            mat.SetColor("_EmissionColor", new Color(newIntensity, newIntensity, currentEmission.b));
+                        }
+                    }
+                    else
+                    {
+                        // reduce the intensity 
+                        float newIntensity = currentEmission.r - 0.2f;
+                        mat.SetColor("_EmissionColor", new Color(newIntensity, newIntensity, currentEmission.b));
+                    }
+                }
+            }
+
+            //increase the flare view's metalic and smoothness values
+            if (flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") < 0.45)
+            {
+                float newMetallic = flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") + 0.02f;
+                flareView.GetComponent<Renderer>().material.SetFloat("_Metallic", newMetallic);
+            }
+            else if (flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") < 0.55)
+            {
+                float newSmoothness = flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") + 0.05f;
+                flareView.GetComponent<Renderer>().material.SetFloat("_Glossiness", newSmoothness);
+            }
+            //randomly decrease smoothness and metallic values
+            else if (Random.value > 0.7f)
+            {
+                float newMetallic = flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") - 0.02f;
+                flareView.GetComponent<Renderer>().material.SetFloat("_Metallic", newMetallic);
+            }
+            else if (Random.value > 0.7f)
+            {
+                float newSmoothness = flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") - 0.1f;
+                flareView.GetComponent<Renderer>().material.SetFloat("_Glossiness", newSmoothness);
+            }
+
+            // Wait for some time before increasing intensity again
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    public IEnumerator TurnOffLights()
+    {
+        lightsOn = false;
+        //turn sphere lights off
+        while (!lightsOn)
+        {
+            // Iterate through each child of "sphereLights"
+            for (int i = 0; i < sphereLights.transform.childCount; i++)
+            {
+                Transform child = sphereLights.transform.GetChild(i);
+                Renderer renderer = child.GetComponent<Renderer>();
+                Material[] materials = renderer.materials;
+                foreach (Material mat in materials)
+                {
+                    Color currentEmission = mat.GetColor("_EmissionColor");
+                    if (currentEmission.r > 0.4) // reduce intensity have the time
+                    {
+                        float newIntensity = currentEmission.r - intensityIncreaseRate;
+                        mat.SetColor("_EmissionColor", new Color(newIntensity, newIntensity, currentEmission.b));
+                    }
+                    else 
+                    {
+                        //turn particle lights off
+                        particleLights.SetActive(false);
+                    }
+                }
+            }
+
+            //reduce the flare view's metalic and smoothness values
+            if (flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") > 0)
+            {
+                float newMetallic = flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") - 0.02f;
+                flareView.GetComponent<Renderer>().material.SetFloat("_Metallic", newMetallic);
+            }
+            if (flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") > 0)
+            {
+                float newSmoothness = flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") - 0.05f;
+                flareView.GetComponent<Renderer>().material.SetFloat("_Glossiness", newSmoothness);
+            }
+
+            // Wait for some time before reducing intensity again
+            yield return new WaitForSeconds(0.1f);
+        }
+    }   
 
 }

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class randomCharacterAnimator : MonoBehaviour
 {
-    [SerializeField] int numberOfAnimations;
     [SerializeField] GameObject npc;
     private int randomAnimationIndex; //range set as 0-100 on animator controller, range of each animation can be adjusted by priority
     private Animator animator;
