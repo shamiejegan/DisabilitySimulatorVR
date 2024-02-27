@@ -29,9 +29,9 @@ public class ActivityController : MonoBehaviour
     private float intensityIncreaseRate = 0.05f;
     private bool lightsOn = false; //to determine if the lights should be turned on or off so that the coroutines activated can be stopped
 
-    [Header("Cards")]
+    [Header("Country Map")]
     [SerializeField] string[] countryList;
-    [SerializeField] GameObject cards;
+    public string selectedCountry; //to be used in buttonToMapLinking script
 
     [Header("Canvas")]
     [SerializeField] GameObject[] canvasTitles;
@@ -83,7 +83,6 @@ public class ActivityController : MonoBehaviour
         //start without light particles 
         particleLights.SetActive(false);
         //hide all card game objects
-        cards.SetActive(true);
 
         //Initialise canvas objects (array for both left and right screens)
         foreach (GameObject canvasTitle in canvasTitles)
@@ -220,12 +219,10 @@ public class ActivityController : MonoBehaviour
         instructorAnimator.SetBool("StartActivity", false);
         PlayNPCAudioClips(3.0f);
 
-        //start activity without mitigation
-        cards.SetActive(true);
-
         //for every country in array, start timer and display country name
         foreach (string country in countryList)
         {
+            selectedCountry = country;
             foreach (GameObject canvasItem in canvasItems)
             {
                 canvasItem.GetComponent<TextMeshProUGUI>().text = country;

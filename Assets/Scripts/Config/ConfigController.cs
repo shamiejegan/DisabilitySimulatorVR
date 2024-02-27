@@ -11,7 +11,6 @@ public class ConfigController : MonoBehaviour
 
     [SerializeField] GameObject tableConfirmationUI;
     [SerializeField] GameObject genderSelectionUI;
-    [SerializeField] GameObject modeSelectionUI;
 
     [SerializeField] GameObject heightConfigurationUI;
 
@@ -21,7 +20,6 @@ public class ConfigController : MonoBehaviour
 
     //default player preference configurations
     private string gender = "Female";
-    private string mode = "Sitting";
     private float tableHeight = 1.02f;
     
     public void Start()
@@ -30,7 +28,6 @@ public class ConfigController : MonoBehaviour
         tableConfirmationUI.SetActive(true);
 
         //make all other UI inactive in canvas
-        modeSelectionUI.SetActive(false);
         genderSelectionUI.SetActive(false);
         heightConfigurationUI.SetActive(false);
     }
@@ -39,26 +36,6 @@ public class ConfigController : MonoBehaviour
     {
         //make the begin button inactive in canvas and set the male and female selection buttons as active
         tableConfirmationUI.SetActive(false);
-        modeSelectionUI.SetActive(true);
-    }
-
-    //mode selection events
-    public void sitSelected()
-    {
-        //set gender to female 
-        mode = "Sitting";
-        //go to table height configuration 
-        modeSelectionUI.SetActive(false);
-        genderSelectionUI.SetActive(true);
-
-    }
-
-    public void standSelected()
-    {
-        //set gender to female 
-        mode = "Standing";
-        //go to table height configuration 
-        modeSelectionUI.SetActive(false);
         genderSelectionUI.SetActive(true);
     }
 
@@ -69,7 +46,6 @@ public class ConfigController : MonoBehaviour
         //go to table height configuration 
         genderSelectionUI.SetActive(false);
         configureTableHeight();
-
     }
 
     public void maleSelected()
@@ -102,12 +78,10 @@ public class ConfigController : MonoBehaviour
         tableHeight = (leftControllerHeight + rightControllerHeight) / 2;
 
         // Pass data to other scenes using PlayerPrefs https://docs.unity3d.com/ScriptReference/PlayerPrefs.html 
-        PlayerPrefs.SetString("mode", mode);
         PlayerPrefs.SetString("gender", gender);
         PlayerPrefs.SetFloat("tableHeight", tableHeight);
 
         Debug.Log("Table Height: " + tableHeight);
-        Debug.Log("Mode: " + mode);
         Debug.Log("Gender: " +  gender);
 
         // Switch to the next scene
