@@ -4,30 +4,27 @@ using UnityEngine;
 
 public class randomCharacterAnimator : MonoBehaviour
 {
-    public int randomAnimationIndex;
+    [SerializeField] int numberOfAnimations;
+    [SerializeField] GameObject npc;
+    private int randomAnimationIndex; //range set as 0-100 on animator controller, range of each animation can be adjusted by priority
     private Animator animator;
     private bool animate = true;
 
-    [SerializeField] int numberOfAnimations = 15;
-    [SerializeField] GameObject npc;
+    //Instructor details to identify when instructor as started the activity
+    [SerializeField] GameObject instructor; 
+    private Animator instructorAnimator;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        instructorAnimator = instructor.GetComponent<Animator>();
         //get the animator component
         animator = npc.GetComponent<Animator>();
-        randomAnimationIndex = Random.Range(0, numberOfAnimations);
-        animator.SetInteger("random", randomAnimationIndex);
+        // Start with idle animations
+        randomAnimationIndex = Random.Range(0, 50);
+        animator.SetInteger("random", randomAnimationIndex+2);
 
-        StartAnimation();
-    }
-
-    public void StartAnimation()
-    {
-        randomAnimationIndex = Random.Range(0, numberOfAnimations*2);
-        animator.SetInteger("random", randomAnimationIndex);
-
-        // start the coroutine to update the random animation
         StartCoroutine(UpdateRandomAnimation());
     }
 
@@ -35,8 +32,19 @@ public class randomCharacterAnimator : MonoBehaviour
     {
         while (animate)
         {
-            randomAnimationIndex = Random.Range(0, numberOfAnimations*2);
-            animator.SetInteger("random", randomAnimationIndex);
+            //if npcs should be in chatting state
+            if (instructorAnimator.GetBool("FindingGroup") || instructorAnimator.GetBool("ActivityStarted"))
+            {
+                randomAnimationIndex = Random.Range(0, 100);
+                animator.SetInteger("random", randomAnimationIndex);                
+            }
+            else
+            {
+                //relatively idle animation indices 1-3
+                randomAnimationIndex = Random.Range(0, 50);
+                animator.SetInteger("random", randomAnimationIndex);                
+            }
+
             yield return new WaitForSeconds(0.5f);
         }
     }
