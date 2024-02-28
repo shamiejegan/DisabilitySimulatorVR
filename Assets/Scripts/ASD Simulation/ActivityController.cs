@@ -6,6 +6,8 @@ using TMPro;
 
 public class ActivityController : MonoBehaviour
 {
+    public bool activityStarted = false; //for activity controls is other scripts
+
     [Header("Instructor")]
     [SerializeField] GameObject instructor;
     [SerializeField] AudioClip[] instructorAudioClips;
@@ -214,6 +216,7 @@ public class ActivityController : MonoBehaviour
     private IEnumerator ActivityStart()
     {
         Debug.Log("Activity Started");
+        activityStarted = true;
         instructorAnimator.SetBool("ActivityStarted", true);
         instructorAnimator.SetBool("StartActivity", false);
         PlayNPCAudioClips(3.0f);
@@ -418,7 +421,7 @@ public class ActivityController : MonoBehaviour
                 float newMetallic = flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") + 0.02f;
                 flareView.GetComponent<Renderer>().material.SetFloat("_Metallic", newMetallic);
             }
-            else if (flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") < 0.55)
+            else if (flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") < 0.50)
             {
                 float newSmoothness = flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") + 0.05f;
                 flareView.GetComponent<Renderer>().material.SetFloat("_Glossiness", newSmoothness);
