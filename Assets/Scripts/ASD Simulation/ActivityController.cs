@@ -59,8 +59,11 @@ public class ActivityController : MonoBehaviour
     private AudioSource timerEndedAudioClip;
 
     [Header("Mitigation Tools")]
+    [SerializeField] GameObject headphones;
     public bool headphonesSelected = false;
+    [SerializeField] GameObject shades;
     public bool shadesSelected = false;
+    [SerializeField] AudioClip soothingMusic;
 
     // Start is called before the first frame update
     void Start()
@@ -103,6 +106,11 @@ public class ActivityController : MonoBehaviour
         timerAudioClip = timerAudio.GetComponent<AudioSource>();
         timerEndedAudioClip = timerEndedAudio.GetComponent<AudioSource>();
 
+        //initialise mitigation tools to false
+        headphones.SetActive(false);
+        shades.SetActive(false);
+
+
         //Start Simulation
         StartSimulation();
 
@@ -122,6 +130,7 @@ public class ActivityController : MonoBehaviour
         //start game briefing after 3 seconds from the start of the simulation
         yield return new WaitForSeconds(3);
         StartCoroutine(GameBriefing());
+
     }
 
     private IEnumerator GameBriefing()
@@ -148,20 +157,27 @@ public class ActivityController : MonoBehaviour
         PlayInstructorAudioClip(1);
         // find duration of instructor audio clip and wait for that duration before playing inner monologue audio clip
         yield return new WaitForSeconds(instructorAudioSource.clip.length);
-        // PlayInnerMonologueAudioClip(1, loop: false);
-        // instructorAnimator.SetBool("InnerMonologueOn", true);
-        // yield return new WaitForSeconds(innerMonologueAudioSource.clip.length - 1);
-        // instructorAnimator.SetBool("InnerMonologueOn", false);
-        StartCoroutine(FindingGroup());
+
+        //rotate npcs to target rotations after instructor ends briefing
+        for (int i = 0; i < npcs.Length; i++)
+        {
+            npcs[i].transform.eulerAngles = npcTargetRotations[i];
+        }
+
+        PlayInnerMonologueAudioClip(1, loop: false);
+        instructorAnimator.SetBool("GroupBriefing", false);
+        instructorAnimator.SetBool("InnerMonologueOn", true);
+        PlayNPCAudioClips(8.0f);
         StartCoroutine(TurnOnLights());
+        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length);
+        StartCoroutine(FindingGroup());
+        instructorAnimator.SetBool("InnerMonologueOn", false);
     }
 
     private IEnumerator FindingGroup()
     {
         Debug.Log("Finding Group");
         instructorAnimator.SetBool("FindingGroup", true);
-        instructorAnimator.SetBool("GroupBriefing", false);
-        PlayNPCAudioClips(8.0f);
         instructorAnimator.SetBool("InnerMonologueOn", true);
         PlayInnerMonologueAudioClip(index: 2, loop: false);
         yield return new WaitForSeconds(innerMonologueAudioSource.clip.length);
@@ -211,6 +227,9 @@ public class ActivityController : MonoBehaviour
         PlayInstructorAudioClip(2);
         yield return new WaitForSeconds(instructorAudioSource.clip.length - 1);
         StartCoroutine(ActivityStart());
+        headphones.SetActive(true);
+        shades.SetActive(true);
+
     }
 
     private IEnumerator ActivityStart()
@@ -224,11 +243,22 @@ public class ActivityController : MonoBehaviour
         //for every country in array, start timer and display country name
         foreach (string country in countryList)
         {
+            // update public vairable selectedCountry 
             selectedCountry = country;
+            //update text on screen
             foreach (GameObject canvasItem in canvasItems)
             {
                 canvasItem.GetComponent<TextMeshProUGUI>().text = country;
             }
+            //trigger select mitigation inner monologue until both mitigation tools are selected from the nth country
+            if (country == countryList[0])
+            {
+                headphones.SetActive(true);
+                shades.SetActive(true);
+
+                StartCoroutine(SelectMitigation()); 
+            }
+
 
             //begin countdown timer for each round in activity, reset with each country in list
             int timer = roundTimer;
@@ -246,18 +276,12 @@ public class ActivityController : MonoBehaviour
             }
             PlayTimerEndedClip();
 
-            //trigger select mitigation inner monologue until both mitigation tools are selected from the 5th country
-            if (country == countryList[4])
-            {
-                SelectMitigation(); 
-            }
-
             yield return new WaitForSeconds(1);
 
         }
     }
 
-    private void SelectMitigation()
+    private IEnumerator SelectMitigation()
     {
         // repeat the inner monologue audio clip to grab mitigation tools with 2 second delay until the player selects them both
         while (headphonesSelected == false || shadesSelected == false)
@@ -265,16 +289,20 @@ public class ActivityController : MonoBehaviour
             // This will only be triggered 1 second after the last inner monologue audio clip has finished playing
             if (headphonesSelected == true)
             {
-                StopNPCAudioClips(2.0f);
-                // StopInnerMonologueAudioClip();
+                StopNPCAudioClips(5.0f);
+
             }
             if (shadesSelected == true)
             {
                 StartCoroutine(TurnOffLights());
             }
+            yield return new WaitForSeconds(1);
+
         }
-        // TODO: if both mitigation tools are selected, ensure audio is stopped and lights are no longer glaring  
-        StopNPCAudioClips(0f);
+        //once both are selected, stop all symptoms 
+        StopNPCAudioClips(2.0f);
+        PlaySoothingMusic();
+        StartCoroutine(TurnOffLights());
     }
 
     // utilities 
@@ -333,11 +361,6 @@ public class ActivityController : MonoBehaviour
             //fade out background audio
             StartCoroutine(FadeOut(GetComponent<AudioSource>(), 10.0f));
         }
-        //rotate npcs to target rotations
-        for (int i = 0; i < npcs.Length; i++)
-        {
-            npcs[i].transform.eulerAngles = npcTargetRotations[i];
-        }
     }
     public void StopNPCAudioClips(float fadeTime = 5.0f)
     {
@@ -351,6 +374,13 @@ public class ActivityController : MonoBehaviour
         //fade background audio back in 
         StartCoroutine(FadeIn(GetComponent<AudioSource>(), fadeTime));
 
+    }
+
+    public void PlaySoothingMusic(float fadeTime = 5.0f)
+    {
+        //play soothing music
+        GetComponent<AudioSource>().clip = soothingMusic;
+        StartCoroutine(FadeIn(GetComponent<AudioSource>(), fadeTime));
     }
 
     public IEnumerator FadeOut(AudioSource audioSource, float FadeTime)
@@ -416,25 +446,25 @@ public class ActivityController : MonoBehaviour
             }
 
             //increase the flare view's metalic and smoothness values
-            if (flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") < 0.45)
+            if (flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") < 0.5)
             {
                 float newMetallic = flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") + 0.02f;
                 flareView.GetComponent<Renderer>().material.SetFloat("_Metallic", newMetallic);
             }
-            else if (flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") < 0.50)
+            else if (flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") < 0.55)
             {
                 float newSmoothness = flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") + 0.05f;
                 flareView.GetComponent<Renderer>().material.SetFloat("_Glossiness", newSmoothness);
             }
             //randomly decrease smoothness and metallic values
-            else if (Random.value > 0.7f)
+            else if (Random.value > 0.6f)
             {
                 float newMetallic = flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") - 0.02f;
                 flareView.GetComponent<Renderer>().material.SetFloat("_Metallic", newMetallic);
             }
             else if (Random.value > 0.7f)
             {
-                float newSmoothness = flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") - 0.1f;
+                float newSmoothness = flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") - 0.05f;
                 flareView.GetComponent<Renderer>().material.SetFloat("_Glossiness", newSmoothness);
             }
 
@@ -484,7 +514,7 @@ public class ActivityController : MonoBehaviour
             }
 
             // Wait for some time before reducing intensity again
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.01f);
         }
     }   
 

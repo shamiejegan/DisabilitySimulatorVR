@@ -12,6 +12,8 @@ public class ButtonToMapLinking : MonoBehaviour, IPointerEnterHandler, IPointerE
     private string countryName;
     private bool activityStarted;
     private bool allowHover=true;
+    private bool headphonesSelected = false;
+    private bool shadesSelected = false;
 
     void Start()
     {
@@ -19,16 +21,32 @@ public class ButtonToMapLinking : MonoBehaviour, IPointerEnterHandler, IPointerE
         mapImage = map.GetComponent<Image>();
         countryName = activityManager.GetComponent<ActivityController>().selectedCountry;
         activityStarted = activityManager.GetComponent<ActivityController>().activityStarted;
+        headphonesSelected = activityManager.GetComponent<ActivityController>().headphonesSelected;
+        shadesSelected = activityManager.GetComponent<ActivityController>().shadesSelected;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         countryName = activityManager.GetComponent<ActivityController>().selectedCountry;
         activityStarted = activityManager.GetComponent<ActivityController>().activityStarted;
+        headphonesSelected = activityManager.GetComponent<ActivityController>().headphonesSelected;
+        shadesSelected = activityManager.GetComponent<ActivityController>().shadesSelected;
 
-        if (allowHover && activityStarted)
+        if (allowHover && activityStarted && !(headphonesSelected && shadesSelected))
         {
             mapImage.color = Color.blue;
+        }
+        if(allowHover && activityStarted && headphonesSelected && shadesSelected)
+        {
+            
+            if (mapImage.sprite.name == countryName)
+            {
+                mapImage.color = Color.green;
+            }
+            else
+            {
+                mapImage.color = Color.red;
+            }
         }
     }
 
