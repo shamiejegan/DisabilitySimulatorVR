@@ -55,7 +55,7 @@ public class ActivityController : MonoBehaviour
 
     [Header("Timers")]
     private int groupFinderTimer = 30;
-    private int roundTimer = 10;
+    private int roundTimer = 5;
     [SerializeField] GameObject timerAudio;
     private AudioSource timerAudioClip;
     [SerializeField] GameObject timerEndedAudio;
@@ -229,7 +229,7 @@ public class ActivityController : MonoBehaviour
 
         //stop symptoms 
         StopInnerMonologueAudioClip();
-        StopNPCAudioClips(5.0f);
+        StopNPCAudioClips(5.0f, minVolume: 0.2f);
         StartCoroutine(TurnOffLights());
         heartBeatAudioSource.Stop();
 
@@ -283,10 +283,16 @@ public class ActivityController : MonoBehaviour
             //update text on screen
             canvasItem.GetComponent<TextMeshProUGUI>().text = country;
             //trigger select mitigation inner monologue until both mitigation tools are selected from the nth country
-            if (country == countryList[3])
+            if (country == countryList[4])
             {
+                //Play instructor instructions to reach out to mitigation tools and activate the tools 
                 headphones.SetActive(true);
                 shades.SetActive(true);
+                StopNPCAudioClips(2.0f, minVolume: 0.5f);
+                PlayInstructorAudioClip(3);         
+                //After instructions, replay npc clips 
+                yield return new WaitForSeconds(instructorAudioSource.clip.length);
+                PlayNPCAudioClips(5.0f);       
 
                 StartCoroutine(SelectMitigation()); 
             }
@@ -296,8 +302,16 @@ public class ActivityController : MonoBehaviour
             while (timer >= 0)
             {
                 canvasTimer.GetComponent<TextMeshProUGUI>().text = timer.ToString();
+                //if the mitigation tools are selected, make timer run slower 
+                if (headphonesSelected && shadesSelected)
+                {
+                    yield return new WaitForSeconds(2);
+                }
+                else
+                {
+                    yield return new WaitForSeconds(1);
+                }
                 //update values every second, this will also control when the next coroutine starts
-                yield return new WaitForSeconds(1);
                 timer--;
                 // play audio to indicate time is running out
                 PlayTimerAudioClip();
@@ -333,7 +347,7 @@ public class ActivityController : MonoBehaviour
             // This will only be triggered 1 second after the last inner monologue audio clip has finished playing
             if (headphonesSelected == true)
             {
-                StopNPCAudioClips(5.0f);
+                StopNPCAudioClips(2.0f);
 
             }
             if (shadesSelected == true)
@@ -346,6 +360,8 @@ public class ActivityController : MonoBehaviour
         //once both are selected, stop all symptoms 
         StopNPCAudioClips(2.0f);
         PlaySoothingMusic();
+        //stop playing heart beat
+        heartBeatAudioSource.Stop();
         StartCoroutine(TurnOffLights());
     }
 
@@ -395,8 +411,6 @@ public class ActivityController : MonoBehaviour
                 //gradually increase volume of audio clip over 5 seconds
                 StartCoroutine(FadeIn(npc.GetComponent<AudioSource>(), fadeTime, intermitent: true));
             }
-            // //fade out background audio
-            // StartCoroutine(FadeOut(GetComponent<AudioSource>(), 10.0f));
         }
     }
 
@@ -453,24 +467,24 @@ public class ActivityController : MonoBehaviour
         innerMonologueAudioSource.Stop();
     }
 
-    public void StopNPCAudioClips(float fadeTime = 5.0f)
+    public void StopNPCAudioClips(float fadeTime = 5.0f, float minVolume = 0.0f)
     {
         Debug.Log("Stop NPC Audio Clips");
         //for each npc, play a random audio clip from the array npcAudioClips
         foreach (GameObject npc in npcs)
         {
             //gradually reduce volume of audio clip over 5 seconds
-            StartCoroutine(FadeOut(npc.GetComponent<AudioSource>(), fadeTime));
+            StartCoroutine(FadeOut(npc.GetComponent<AudioSource>(), fadeTime, minVolume: minVolume));
         }
         //fade background audio back in 
         StartCoroutine(FadeIn(GetComponent<AudioSource>(), fadeTime));
 
     }
 
-    public IEnumerator FadeOut(AudioSource audioSource, float FadeTime)
+    public IEnumerator FadeOut(AudioSource audioSource, float FadeTime, float minVolume = 0.0f)
     {
         float startVolume = audioSource.volume;
-        while (audioSource.volume > 0)
+        while (audioSource.volume > minVolume)
         {
             audioSource.volume -= startVolume * Time.deltaTime / FadeTime;
             yield return null;

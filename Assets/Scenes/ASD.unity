@@ -54155,11 +54155,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 81cb525a89ad06549aa4d75d4ac28e45, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.03186
+      value: 0.02873
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 81cb525a89ad06549aa4d75d4ac28e45, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.06984
+      value: -0.0688
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 81cb525a89ad06549aa4d75d4ac28e45, type: 3}
       propertyPath: m_LocalPosition.z
@@ -60265,7 +60265,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1210471598
 AudioSource:
@@ -60278,14 +60278,14 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 120
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 500
@@ -73073,6 +73073,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 19afd5bbf206dba41839c6cdb15372a1, type: 3}
   - {fileID: 8300000, guid: 0ec63c931ba7b524b9567845efc1323b, type: 3}
   - {fileID: 8300000, guid: c5ce6216b87fce843be248c53f92cb8b, type: 3}
+  - {fileID: 8300000, guid: 8d298e1794479474285412d8228ea816, type: 3}
   innerMonologue_M: {fileID: 1780345064}
   innerMonologueAudioClips_M:
   - {fileID: 8300000, guid: 5a86e710fbe9b56499d6e485bd86426a, type: 3}
@@ -84602,11 +84603,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0762f13e7068b16458cd10f452e150ab, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.03588
+      value: 0.03845
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0762f13e7068b16458cd10f452e150ab, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.07003
+      value: -0.06939
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0762f13e7068b16458cd10f452e150ab, type: 3}
       propertyPath: m_LocalPosition.z
@@ -85369,13 +85370,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1780345064}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2.5005891, y: 0.5315206, z: 5.969552}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1780345066
 AudioSource:
@@ -85395,7 +85396,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 120
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 500
@@ -98066,7 +98067,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 110
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 500
@@ -113581,7 +113582,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6638622320935529044}
   m_LocalRotation: {x: -0.7068294, y: 0.019805282, z: 0.019805282, w: 0.7068294}
-  m_LocalPosition: {x: -1.3588785, y: 0.99829817, z: -4.41}
+  m_LocalPosition: {x: -1.37, y: 0.99829817, z: -4.53}
   m_LocalScale: {x: 78.2839, y: 78.283936, z: 130.96468}
   m_ConstrainProportionsScale: 0
   m_Children:
