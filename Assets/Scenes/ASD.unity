@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.180534, g: 0.22136414, b: 0.28015366, a: 1}
+  m_IndirectSpecularColor: {r: 0.18267743, g: 0.22566217, b: 0.29128197, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -41544,14 +41544,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 794320734}
-  m_LocalRotation: {x: -0.14305499, y: -0.43722048, z: 0.55702937, w: 0.6914419}
+  m_LocalRotation: {x: -0.06380411, y: -0.3713028, z: 0.602974, w: 0.70319676}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.0000001, y: 1.0000001, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 16.814, y: -52.951, z: 69.291}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 20.98, y: -39.917, z: 73.531}
 --- !u!1 &814748029
 GameObject:
   m_ObjectHideFlags: 0
@@ -53707,7 +53707,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1024303575
 GameObject:
@@ -60265,7 +60265,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1210471598
 AudioSource:
@@ -60696,7 +60696,7 @@ Transform:
   m_Children:
   - {fileID: 8612096}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1235558709
 GameObject:
@@ -73051,7 +73051,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1483839984
 MonoBehaviour:
@@ -73074,6 +73074,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 0ec63c931ba7b524b9567845efc1323b, type: 3}
   - {fileID: 8300000, guid: c5ce6216b87fce843be248c53f92cb8b, type: 3}
   - {fileID: 8300000, guid: 8d298e1794479474285412d8228ea816, type: 3}
+  - {fileID: 8300000, guid: ef7c305f52912a0459d7a42094755f1e, type: 3}
   innerMonologue_M: {fileID: 1780345064}
   innerMonologueAudioClips_M:
   - {fileID: 8300000, guid: 5a86e710fbe9b56499d6e485bd86426a, type: 3}
@@ -73081,6 +73082,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: c11b49e12f6f1224ca5f90dd0755e4b4, type: 3}
   - {fileID: 8300000, guid: bf2f35bd4d8eda642a66e283301e0bd9, type: 3}
   - {fileID: 8300000, guid: 456601a6047a6b349acba5d75b0a5375, type: 3}
+  - {fileID: 8300000, guid: c86a76bf04098b14cbd3869c044b6218, type: 3}
+  - {fileID: 8300000, guid: 2aff14ac40fa1844690e6a7eb5e147ea, type: 3}
   innerMonologue_F: {fileID: 1210471596}
   innerMonologueAudioClips_F:
   - {fileID: 8300000, guid: f25ecfab7bcb0324898f4dbe8e9dbb1a, type: 3}
@@ -73088,6 +73091,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: aa75ba83dbc58cc43b528d0431fddeec, type: 3}
   - {fileID: 8300000, guid: d0d0a06f4d7f17741b817fb5587e3d93, type: 3}
   - {fileID: 8300000, guid: 682c60f0b9c083d48a0fbc7f543002b3, type: 3}
+  - {fileID: 8300000, guid: 6b61bc180d21efd47a9e6e7b6905b52e, type: 3}
+  - {fileID: 8300000, guid: 993160848eb3d324f8ac7470e5fd44ae, type: 3}
   heartBeat: {fileID: 1011396145}
   sphereLights: {fileID: 1289407636}
   particleLights: {fileID: 2095662181}
@@ -85376,7 +85381,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1780345066
 AudioSource:
@@ -98041,14 +98046,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2042011142}
-  m_LocalRotation: {x: 0.2533887, y: 0.071184896, z: 0.030538196, w: 0.96425843}
+  m_LocalRotation: {x: 0.25425568, y: 0.03944717, z: 0.022191733, w: 0.96607745}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1.0000001, z: 1.0000001}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 28.968, y: 10.055, z: 6.232}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 29.308, y: 5.759, z: 4.139}
 --- !u!82 &2066745107
 AudioSource:
   m_ObjectHideFlags: 0

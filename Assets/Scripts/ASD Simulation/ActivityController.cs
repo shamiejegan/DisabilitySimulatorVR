@@ -230,7 +230,7 @@ public class ActivityController : MonoBehaviour
         //stop symptoms 
         StopInnerMonologueAudioClip();
         StopNPCAudioClips(5.0f, minVolume: 0.2f);
-        StartCoroutine(TurnOffLights());
+        StartCoroutine(TurnOffLights(10.0f));
         heartBeatAudioSource.Stop();
 
         //play instructor audio clip to start activity
@@ -292,7 +292,7 @@ public class ActivityController : MonoBehaviour
                 PlayInstructorAudioClip(3);         
                 //After instructions, replay npc clips 
                 yield return new WaitForSeconds(instructorAudioSource.clip.length);
-                PlayNPCAudioClips(5.0f);       
+                PlayNPCAudioClips(5.0f);
 
                 StartCoroutine(SelectMitigation()); 
             }
@@ -363,6 +363,7 @@ public class ActivityController : MonoBehaviour
         //stop playing heart beat
         heartBeatAudioSource.Stop();
         StartCoroutine(TurnOffLights());
+
     }
 
     /*******************/
@@ -432,6 +433,13 @@ public class ActivityController : MonoBehaviour
         //play soothing music
         GetComponent<AudioSource>().clip = soothingMusic;
         StartCoroutine(FadeIn(GetComponent<AudioSource>(), fadeTime));
+    }
+
+    public void StopSoothingMusic(float fadeTime = 5.0f)
+    {
+        Debug.Log("Stop Soothing Music");
+        //stop soothing music
+        StartCoroutine(FadeOut(GetComponent<AudioSource>(), fadeTime));
     }
 
     public IEnumerator FadeIn(AudioSource audioSource, float FadeTime, bool intermitent = false)
@@ -596,12 +604,12 @@ public class ActivityController : MonoBehaviour
             //reduce the flare view's metalic and smoothness values
             if (flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") > 0)
             {
-                float newMetallic = flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") - 0.02f;
+                float newMetallic = flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") - Time.deltaTime / fadeTime;
                 flareView.GetComponent<Renderer>().material.SetFloat("_Metallic", newMetallic);
             }
             if (flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") > 0)
             {
-                float newSmoothness = flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") - 0.05f;
+                float newSmoothness = flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") - Time.deltaTime / fadeTime;
                 flareView.GetComponent<Renderer>().material.SetFloat("_Glossiness", newSmoothness);
             }
 
@@ -610,14 +618,24 @@ public class ActivityController : MonoBehaviour
         }
     }   
 
+    /*******************/
+    /* Other Utilities */
+    /*******************/
+
     private IEnumerator EndSimulation()
     {
         Debug.Log("End Simulation");
 
+        //add great work audio of the user has selected the headphones and shades during the activity
+        if(headphonesSelected && shadesSelected)
+        {
+            PlayInstructorAudioClip(4);
+            yield return new WaitForSeconds(instructorAudioSource.clip.length);
+        }
+
         //stop all audio except for heart beat and timer
         StopInnerMonologueAudioClip();
         StopNPCAudioClips(2.0f);
-        StartCoroutine(FadeOut(GetComponent<AudioSource>(), 5.0f));
         StartCoroutine(FadeOut(instructorAudioSource, 5.0f));
         foreach (GameObject npc in npcs)
         {
@@ -626,6 +644,7 @@ public class ActivityController : MonoBehaviour
 
         //stop light effect
         StartCoroutine(TurnOffLights());
+        StopSoothingMusic(5.0f);
 
         //make view fade to black over 5 seconds
         Debug.Log("Fading to black...");
