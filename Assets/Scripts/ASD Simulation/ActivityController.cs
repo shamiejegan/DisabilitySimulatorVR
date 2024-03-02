@@ -3,11 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class ActivityController : MonoBehaviour
 {
-    public bool activityStarted = false; //for activity controls is other scripts
+    /************************/
+    /* Variable Definitions */
+    /************************/
 
+    // public variables that will be used in other scripts
+    public bool activityStarted = false; 
+    public string selectedCountry; 
+    
+    //for ending game
+    [SerializeField] GameObject fadeView; 
+    
     [Header("Instructor")]
     [SerializeField] GameObject instructor;
     [SerializeField] AudioClip[] instructorAudioClips;
@@ -22,6 +32,10 @@ public class ActivityController : MonoBehaviour
     [SerializeField] AudioClip[] innerMonologueAudioClips_F;
     private AudioSource innerMonologueAudioSource;
     private AudioClip[] innerMonologueAudioClips;
+    private bool innerMonologueOn;
+    [SerializeField] GameObject heartBeat;
+    private AudioSource heartBeatAudioSource;
+
 
     [Header("Lights")]
     [SerializeField] GameObject sphereLights;
@@ -29,26 +43,15 @@ public class ActivityController : MonoBehaviour
     [SerializeField] GameObject flareView;
     private int maxIntensity = 1;
     private float intensityIncreaseRate = 0.05f;
-    private bool lightsOn = false; //to determine if the lights should be turned on or off so that the coroutines activated can be stopped
+    private bool lightsOn; 
 
     [Header("Country Map")]
     [SerializeField] string[] countryList;
-    public string selectedCountry; //to be used in buttonToMapLinking script
 
     [Header("Canvas")]
-    [SerializeField] GameObject[] canvasTitles;
-    [SerializeField] GameObject[] canvasTimers;
-    [SerializeField] GameObject[] canvasItems;
-
-    [Header("NPCs")]
-    [SerializeField] GameObject[] npcs;
-    [SerializeField] AudioClip[] npcAudioClips;
-    [SerializeField] Vector3[] npcTargetRotations;
-    private int randomIndex;
-
-    [Header("GameScore")]
-    public int score_without_mitigation = 0;
-    public int score_with_mitigation = 0;
+    [SerializeField] GameObject canvasTitle;
+    [SerializeField] GameObject canvasTimer;
+    [SerializeField] GameObject canvasItem;
 
     [Header("Timers")]
     private int groupFinderTimer = 30;
@@ -58,40 +61,36 @@ public class ActivityController : MonoBehaviour
     [SerializeField] GameObject timerEndedAudio;
     private AudioSource timerEndedAudioClip;
 
+    [Header("NPCs")]
+    [SerializeField] GameObject[] npcs;
+    [SerializeField] AudioClip[] npcAudioClips;
+    [SerializeField] Vector3[] npcTargetRotations;
+    private int randomIndex;
+
+
     [Header("Mitigation Tools")]
     [SerializeField] GameObject headphones;
-    public bool headphonesSelected = false;
+    public bool headphonesSelected;
     [SerializeField] GameObject shades;
-    public bool shadesSelected = false;
+    public bool shadesSelected;
     [SerializeField] AudioClip soothingMusic;
+    private int roundsWithMitigation;
 
-    // Start is called before the first frame update
     void Start()
-    {
-        // Get animator components 
-        instructorAnimator = instructor.GetComponent<Animator>();
+    {    
+        /****************************/
+        /* Variable initialisations */
+        /****************************/
 
-        //Get audio components
+        //Instructor components 
+        instructorAnimator = instructor.GetComponent<Animator>();
         instructorAudioSource = instructor.GetComponent<AudioSource>();
 
-        //start without light particles 
+        //Light Components  
         particleLights.SetActive(false);
+        lightsOn = false;
 
-        //Initialise canvas objects (array for both left and right screens)
-        foreach (GameObject canvasTitle in canvasTitles)
-        {
-            canvasTitle.GetComponent<TextMeshProUGUI>().text = "ACTIVITY TIME!";
-        }
-        foreach (GameObject canvasTimer in canvasTimers)
-        {
-            canvasTimer.SetActive(false);
-        }
-        foreach (GameObject canvasItem in canvasItems)
-        {
-            canvasItem.SetActive(false);
-        }
-
-        //Initialise inner monologue audio source and clips based on player gender
+        //Inner Monologue Components
         if (PlayerPrefs.GetString("gender")=="Male")
         {
             innerMonologueAudioSource = innerMonologue_M.GetComponent<AudioSource>();
@@ -102,50 +101,65 @@ public class ActivityController : MonoBehaviour
             innerMonologueAudioSource = innerMonologue_F.GetComponent<AudioSource>();
             innerMonologueAudioClips = innerMonologueAudioClips_F;
         }
-        //Assign timer audios
+        innerMonologueOn = false;
+        heartBeatAudioSource = heartBeat.GetComponent<AudioSource>();
+
+        //Canvas Components
+        canvasTitle.GetComponent<TextMeshProUGUI>().text = "ACTIVITY TIME!";
+        canvasTimer.GetComponent<TextMeshProUGUI>().text = " ";
+        canvasItem.GetComponent<TextMeshProUGUI>().text = "Spot The Country";
+
+        //Timer Components
         timerAudioClip = timerAudio.GetComponent<AudioSource>();
         timerEndedAudioClip = timerEndedAudio.GetComponent<AudioSource>();
 
-        //initialise mitigation tools to false
+        //Mitigation Factors 
+        headphonesSelected = false;
         headphones.SetActive(false);
+        shadesSelected = false;
         shades.SetActive(false);
 
-
-        //Start Simulation
+        roundsWithMitigation = 0;
+        /********************/
+        /* Start Simulation */
+        /********************/
         StartSimulation();
 
     }
 
     private void StartSimulation()
     {
+        // TODO: Include a primer to acustomise the user to their inner voice and the classmates around them. 
         Debug.Log("Start Simulation");
         StartCoroutine(StartBriefing());
     }
 
-    // time-based controllers 
+    /************************/
+    /* Simulation Scenarios */
+    /************************/
+
     public IEnumerator StartBriefing()
     {
-        Debug.Log("Starting Briefing");
+        Debug.Log("Starting Briefing about the activity within the simulation");
+
+        //initialise idle character animations
         instructorAnimator.SetBool("Start", true);
+        for (int i = 0; i < npcs.Length; i++)
+        {
+            npcs[i].GetComponent<Animator>().SetInteger("random", 0);
+        }
+
         //start game briefing after 3 seconds from the start of the simulation
         yield return new WaitForSeconds(3);
         StartCoroutine(GameBriefing());
-
     }
 
     private IEnumerator GameBriefing()
     {
         Debug.Log("Game Briefing");
         instructorAnimator.SetBool("GameBriefing", true);
-        instructorAnimator.SetBool("Start", false);
         PlayInstructorAudioClip(0);
-        // find duration of instructor audio clip and wait for that duration
-        //start next coroutine 1 second before prevent too much silence between
         yield return new WaitForSeconds(instructorAudioSource.clip.length);
-        // PlayInnerMonologueAudioClip(index: 0, loop: false);
-        // instructorAnimator.SetBool("InnerMonologueOn", true);
-        // yield return new WaitForSeconds(innerMonologueAudioSource.clip.length);
-        instructorAnimator.SetBool("InnerMonologueOn", false);
         StartCoroutine(GroupingBriefing());
     }
 
@@ -155,90 +169,111 @@ public class ActivityController : MonoBehaviour
         instructorAnimator.SetBool("GroupBriefing", true);
         instructorAnimator.SetBool("GameBriefing", false);
         PlayInstructorAudioClip(1);
-        // find duration of instructor audio clip and wait for that duration before playing inner monologue audio clip
-        yield return new WaitForSeconds(instructorAudioSource.clip.length);
 
-        //rotate npcs to target rotations after instructor ends briefing
+        //move npcs and start innter monologue half-way through instructions
+        yield return new WaitForSeconds(instructorAudioSource.clip.length/2);
         for (int i = 0; i < npcs.Length; i++)
         {
             npcs[i].transform.eulerAngles = npcTargetRotations[i];
+            PlayInnerMonologueAudioClip(1, loop: false);
         }
 
-        PlayInnerMonologueAudioClip(1, loop: false);
-        instructorAnimator.SetBool("GroupBriefing", false);
-        instructorAnimator.SetBool("InnerMonologueOn", true);
-        PlayNPCAudioClips(8.0f);
-        StartCoroutine(TurnOnLights());
-        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length);
+        //Start simulation for finding group
+        yield return new WaitForSeconds(instructorAudioSource.clip.length/2);
         StartCoroutine(FindingGroup());
-        instructorAnimator.SetBool("InnerMonologueOn", false);
     }
 
     private IEnumerator FindingGroup()
     {
         Debug.Log("Finding Group");
+        instructorAnimator.SetBool("GroupBriefing", false);
         instructorAnimator.SetBool("FindingGroup", true);
-        instructorAnimator.SetBool("InnerMonologueOn", true);
         PlayInnerMonologueAudioClip(index: 2, loop: false);
+        instructorAnimator.SetBool("InnerMonologueOn", true);
+
+        //start symptoms 
+        PlayNPCAudioClips(10.0f);
+        StartCoroutine(TurnOnLights());
+        heartBeatAudioSource.Play();
+
+        //start countdown timer for group finding
+        canvasItem.GetComponent<TextMeshProUGUI>().text = "ACTIVITY STARTS IN...";
+        canvasTimer.GetComponent<TextMeshProUGUI>().text = groupFinderTimer.ToString();
+        canvasItem.GetComponent<TextMeshProUGUI>().text = "Find A Partner";
+
+        //start inner monologue loop
         yield return new WaitForSeconds(innerMonologueAudioSource.clip.length);
         PlayInnerMonologueAudioClip(index: 3, loop: true);
-        foreach (GameObject canvasItem in canvasItems)
-        {
-            canvasItem.SetActive(true);
-            canvasItem.GetComponent<TextMeshProUGUI>().text = "ACTIVITY STARTS IN...";
-        }
-        foreach (GameObject canvasTimer in canvasTimers)
-        {
-            canvasTimer.SetActive(true);
-            canvasTimer.GetComponent<TextMeshProUGUI>().text = groupFinderTimer.ToString();
-        }
 
         //begin countdown timer for group finding
         int timer = groupFinderTimer;
         while (timer >= 0)
         {
             // update time left on screens
-            foreach (GameObject canvasTimer in canvasTimers)
-            {
-                canvasTimer.GetComponent<TextMeshProUGUI>().text = timer.ToString();
+            canvasTimer.GetComponent<TextMeshProUGUI>().text = timer.ToString();
 
-            }
             PlayTimerAudioClip();
             timer--;
             //update values every second, this will also control when the next coroutine starts
             yield return new WaitForSeconds(1);
         }
+        // bell ring at the end of the timer
         PlayTimerEndedClip();
-        StopInnerMonologueAudioClip();
-        StopNPCAudioClips(10.0f);
+
         StartCoroutine(StartActivity());
     }
 
     private IEnumerator StartActivity()
     {
         Debug.Log("Start Activity");
-        // find duration of instructor audio clip and wait for that duration before starting the next coroutine
-        instructorAnimator.SetBool("InnerMonologueOn", true);
-        PlayInnerMonologueAudioClip(index: 4, loop: false);
-        yield return new WaitForSeconds(innerMonologueAudioSource.clip.length - 1);
-        instructorAnimator.SetBool("StartActivity", true);
+
+        //stop symptoms 
+        StopInnerMonologueAudioClip();
+        StopNPCAudioClips(5.0f);
+        StartCoroutine(TurnOffLights());
+        heartBeatAudioSource.Stop();
+
+        //play instructor audio clip to start activity
         instructorAnimator.SetBool("FindingGroup", false);
         instructorAnimator.SetBool("InnerMonologueOn", false);
+        instructorAnimator.SetBool("StartActivity", true);
         PlayInstructorAudioClip(2);
-        yield return new WaitForSeconds(instructorAudioSource.clip.length - 1);
-        StartCoroutine(ActivityStart());
-        headphones.SetActive(true);
-        shades.SetActive(true);
+
+        //move npcs back to face the front 
+        for (int i = 0; i < npcs.Length; i++)
+        {
+            if (npcs[i].transform.eulerAngles.y > 0)
+            {
+                npcs[i].transform.eulerAngles = new Vector3(0, 10, 0);
+            }
+            else
+            {
+                npcs[i].transform.eulerAngles = new Vector3(0, -10, 0);
+            }
+        }
+
+        //play inner monologue shortly after instruction starts 
+        yield return new WaitForSeconds(6);
+        PlayInnerMonologueAudioClip(index: 4, loop: false);
+
+        //increase symptoms again once instructor begins the game 
+        yield return new WaitForSeconds(instructorAudioSource.clip.length - 6);
+        PlayNPCAudioClips(5.0f);
+        StartCoroutine(TurnOnLights());
+        heartBeatAudioSource.Play();
+
+        StartCoroutine(ActivityStarted());
 
     }
 
-    private IEnumerator ActivityStart()
+    private IEnumerator ActivityStarted()
     {
         Debug.Log("Activity Started");
+
+        //update public variable to control interaction with screen 
         activityStarted = true;
         instructorAnimator.SetBool("ActivityStarted", true);
         instructorAnimator.SetBool("StartActivity", false);
-        PlayNPCAudioClips(3.0f);
 
         //for every country in array, start timer and display country name
         foreach (string country in countryList)
@@ -246,12 +281,9 @@ public class ActivityController : MonoBehaviour
             // update public vairable selectedCountry 
             selectedCountry = country;
             //update text on screen
-            foreach (GameObject canvasItem in canvasItems)
-            {
-                canvasItem.GetComponent<TextMeshProUGUI>().text = country;
-            }
+            canvasItem.GetComponent<TextMeshProUGUI>().text = country;
             //trigger select mitigation inner monologue until both mitigation tools are selected from the nth country
-            if (country == countryList[0])
+            if (country == countryList[3])
             {
                 headphones.SetActive(true);
                 shades.SetActive(true);
@@ -259,15 +291,11 @@ public class ActivityController : MonoBehaviour
                 StartCoroutine(SelectMitigation()); 
             }
 
-
             //begin countdown timer for each round in activity, reset with each country in list
             int timer = roundTimer;
             while (timer >= 0)
             {
-                foreach (GameObject canvasTimer in canvasTimers)
-                {
-                    canvasTimer.GetComponent<TextMeshProUGUI>().text = timer.ToString();
-                }
+                canvasTimer.GetComponent<TextMeshProUGUI>().text = timer.ToString();
                 //update values every second, this will also control when the next coroutine starts
                 yield return new WaitForSeconds(1);
                 timer--;
@@ -276,10 +304,26 @@ public class ActivityController : MonoBehaviour
             }
             PlayTimerEndedClip();
 
-            yield return new WaitForSeconds(1);
+            //check if both mitigation tools are selected, increment the rounds with mitigation
+            if (headphonesSelected && shadesSelected)
+            {
+                roundsWithMitigation++;
+                Debug.Log("Rounds with mitigation: " + roundsWithMitigation);
+            }
 
+            //if rounds with mitigation is greater than 4 or if we have reached the end of the list of countries, end the simulation
+            if (roundsWithMitigation > 4 || country == countryList[countryList.Length - 1])
+            {
+                StartCoroutine(EndSimulation());
+            }
+
+            yield return new WaitForSeconds(1);
         }
     }
+
+    /*********************/
+    /* General Utilities */
+    /*********************/
 
     private IEnumerator SelectMitigation()
     {
@@ -305,19 +349,13 @@ public class ActivityController : MonoBehaviour
         StartCoroutine(TurnOffLights());
     }
 
-    // utilities 
-    public void PlayTimerAudioClip()
-    {
-        //play audio clip to indicate time is running out
-        timerAudioClip.Play();
-    }
-    public void PlayTimerEndedClip()
-    {
-        //play audio clip to indicate time is running out
-        timerEndedAudioClip.Play();
-    }
+    /*******************/
+    /* Audio Utilities */
+    /*******************/
+
     public void PlayInstructorAudioClip(int index)
     {
+        Debug.Log("Play Instructor Audio Clip");
         if (index >= 0 && index < instructorAudioClips.Length)
         {
             instructorAudioSource.clip = instructorAudioClips[index];
@@ -331,6 +369,7 @@ public class ActivityController : MonoBehaviour
 
     public void PlayInnerMonologueAudioClip(int index, bool loop = false)
     {
+        Debug.Log("Play Inner Monologue Audio Clip");
         if (index >= 0 && index < innerMonologueAudioClips.Length)
         {
             innerMonologueAudioSource.clip = innerMonologueAudioClips[index];
@@ -343,11 +382,6 @@ public class ActivityController : MonoBehaviour
         }
     }
 
-    public void StopInnerMonologueAudioClip()
-    {
-        innerMonologueAudioSource.Stop();
-    }
-
     public void PlayNPCAudioClips(float fadeTime = 5.0f)
     {
         Debug.Log("Play NPC Audio Clips");
@@ -356,12 +390,69 @@ public class ActivityController : MonoBehaviour
         {
             randomIndex = Random.Range(0, npcAudioClips.Length);
             npc.GetComponent<AudioSource>().clip = npcAudioClips[randomIndex];
-            //gradually increase volume of audio clip over 5 seconds
-            StartCoroutine(FadeIn(npc.GetComponent<AudioSource>(), fadeTime));
-            //fade out background audio
-            StartCoroutine(FadeOut(GetComponent<AudioSource>(), 10.0f));
+            if (!innerMonologueOn)
+            {
+                //gradually increase volume of audio clip over 5 seconds
+                StartCoroutine(FadeIn(npc.GetComponent<AudioSource>(), fadeTime, intermitent: true));
+            }
+            // //fade out background audio
+            // StartCoroutine(FadeOut(GetComponent<AudioSource>(), 10.0f));
         }
     }
+
+    public void PlayTimerAudioClip()
+    {
+        //play audio clip to indicate time is running out
+        timerAudioClip.Play();
+    }
+
+    public void PlayTimerEndedClip()
+    {
+        //play audio clip to indicate time is running out
+        timerEndedAudioClip.Play();
+    }
+
+    public void PlaySoothingMusic(float fadeTime = 5.0f)
+    {
+        Debug.Log("Play Soothing Music");
+        //play soothing music
+        GetComponent<AudioSource>().clip = soothingMusic;
+        StartCoroutine(FadeIn(GetComponent<AudioSource>(), fadeTime));
+    }
+
+    public IEnumerator FadeIn(AudioSource audioSource, float FadeTime, bool intermitent = false)
+    {
+        float startVolume = audioSource.volume;
+        audioSource.volume = 0;
+        audioSource.Play();
+        while (audioSource.volume < startVolume)
+        {
+            if (intermitent)
+            {
+                bool reduceVolume = Random.value > 0.2f;
+                if (reduceVolume)
+                {
+                    audioSource.volume = Mathf.Min(0.5f, audioSource.volume);
+                }
+                else
+                {
+                    audioSource.volume += startVolume * Time.deltaTime / FadeTime;
+                }
+            }
+            else
+            {
+                audioSource.volume += startVolume * Time.deltaTime / FadeTime;
+            }
+            yield return null;
+        }
+        audioSource.volume = startVolume;
+    }
+
+    public void StopInnerMonologueAudioClip()
+    {
+        innerMonologueAudioSource.Stop();
+    }
+
     public void StopNPCAudioClips(float fadeTime = 5.0f)
     {
         Debug.Log("Stop NPC Audio Clips");
@@ -376,13 +467,6 @@ public class ActivityController : MonoBehaviour
 
     }
 
-    public void PlaySoothingMusic(float fadeTime = 5.0f)
-    {
-        //play soothing music
-        GetComponent<AudioSource>().clip = soothingMusic;
-        StartCoroutine(FadeIn(GetComponent<AudioSource>(), fadeTime));
-    }
-
     public IEnumerator FadeOut(AudioSource audioSource, float FadeTime)
     {
         float startVolume = audioSource.volume;
@@ -395,21 +479,13 @@ public class ActivityController : MonoBehaviour
         audioSource.volume = startVolume;
     }
 
-    public IEnumerator FadeIn(AudioSource audioSource, float FadeTime)
-    {
-        float startVolume = audioSource.volume;
-        audioSource.volume = 0;
-        audioSource.Play();
-        while (audioSource.volume < startVolume)
-        {
-            audioSource.volume += startVolume * Time.deltaTime / FadeTime;
-            yield return null;
-        }
-        audioSource.volume = startVolume;
-    }
+    /*******************/
+    /* Light Utilities */
+    /*******************/
 
     public IEnumerator TurnOnLights()
     {
+        Debug.Log("Turn On Lights");
         lightsOn = true;
         //turn particle lights on 
         particleLights.SetActive(true);
@@ -445,7 +521,8 @@ public class ActivityController : MonoBehaviour
                 }
             }
 
-            //increase the flare view's metalic and smoothness values
+            //increase the flare view's metalic and smoothness values 
+
             if (flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") < 0.5)
             {
                 float newMetallic = flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") + 0.02f;
@@ -456,7 +533,7 @@ public class ActivityController : MonoBehaviour
                 float newSmoothness = flareView.GetComponent<Renderer>().material.GetFloat("_Glossiness") + 0.05f;
                 flareView.GetComponent<Renderer>().material.SetFloat("_Glossiness", newSmoothness);
             }
-            //randomly decrease smoothness and metallic values
+            // randomly decrease smoothness and metallic values
             else if (Random.value > 0.6f)
             {
                 float newMetallic = flareView.GetComponent<Renderer>().material.GetFloat("_Metallic") - 0.02f;
@@ -473,8 +550,9 @@ public class ActivityController : MonoBehaviour
         }
     }
 
-    public IEnumerator TurnOffLights()
+    public IEnumerator TurnOffLights(float fadeTime = 5.0f)
     {
+        Debug.Log("Turn Off Lights");
         lightsOn = false;
         //turn sphere lights off
         while (!lightsOn)
@@ -518,4 +596,34 @@ public class ActivityController : MonoBehaviour
         }
     }   
 
+    private IEnumerator EndSimulation()
+    {
+        Debug.Log("End Simulation");
+
+        //stop all audio except for heart beat and timer
+        StopInnerMonologueAudioClip();
+        StopNPCAudioClips(2.0f);
+        StartCoroutine(FadeOut(GetComponent<AudioSource>(), 5.0f));
+        StartCoroutine(FadeOut(instructorAudioSource, 5.0f));
+        foreach (GameObject npc in npcs)
+        {
+            StartCoroutine(FadeOut(npc.GetComponent<AudioSource>(), 5.0f));
+        }
+
+        //stop light effect
+        StartCoroutine(TurnOffLights());
+
+        //make view fade to black over 5 seconds
+        Debug.Log("Fading to black...");
+        while (fadeView.GetComponent<Renderer>().material.color.a < 1)
+        {
+            Color fadeColor = fadeView.GetComponent<Renderer>().material.color;
+            fadeColor.a += 0.01f;
+            fadeView.GetComponent<Renderer>().material.color = fadeColor;
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        //go to simulation end screen
+        SceneManager.LoadScene("EndSimulation");
+    }
 }
