@@ -7,13 +7,15 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class ASDIntroController : MonoBehaviour
 {
-    [SerializeField] GameObject diverseLineHorizontal;
-    [SerializeField] GameObject diverseLineVertical;
     [SerializeField] float diverseLineTimer;
-    [SerializeField] GameObject asdNPC;
+    [SerializeField] float conditionsTimer;
     [SerializeField] float npcTimer;
     [SerializeField] float readyTimer;
-    [SerializeField] GameObject surroundParticles; 
+    [SerializeField] GameObject diverseLineHorizontal;
+    [SerializeField] GameObject diverseLineVertical;
+    [SerializeField] GameObject asdNPC;
+    [SerializeField] GameObject lights;
+    [SerializeField] GameObject sounds;
     [SerializeField] GameObject leftController;
     [SerializeField] GameObject rightController;
 
@@ -24,14 +26,16 @@ public class ASDIntroController : MonoBehaviour
         diverseLineHorizontal.SetActive(false);
         diverseLineVertical.SetActive(false);
         asdNPC.SetActive(false);
+        lights.SetActive(false);
+        sounds.SetActive(false);
+
         //disable collider by before end of explanation 
         asdNPC.GetComponent<CapsuleCollider>().enabled = false;
-
-        surroundParticles.SetActive(false);
 
         GetComponent<AudioSource>().Play();
         StartCoroutine(showNPC());
         StartCoroutine(showDiverseLine());
+        StartCoroutine(showConditions());
         StartCoroutine(finalIntroAudio());
         StartCoroutine(makeNPCSelectable());
 
@@ -48,6 +52,12 @@ public class ASDIntroController : MonoBehaviour
         diverseLineVertical.SetActive(true);
     }
 
+    public IEnumerator showConditions(){
+        yield return new WaitForSeconds(conditionsTimer);
+        lights.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        sounds.SetActive(true);
+    }
 
     public IEnumerator finalIntroAudio()
     {
