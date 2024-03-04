@@ -852,7 +852,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: QUIT
+  m_text: END
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1617,9 +1617,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "I hope this simulation experience gives you an opportunity to reflect
-    on how you can accomodate your teaching methods for students with ASD. \n\nPlease
-    remember that there is a wide range of symptoms and severity. "
+  m_text: "I hope this simulation experience has helped you understand the challenges
+    that students with Autism may experience, and the importance of accomodating
+    our teaching methods to allow students with Autism to thrive in school. \n\nPlease
+    take some time to reflect on how you can accomodate your teaching methods for
+    students with Autism.  "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
