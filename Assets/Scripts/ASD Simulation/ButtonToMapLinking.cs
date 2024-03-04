@@ -14,6 +14,8 @@ public class ButtonToMapLinking : MonoBehaviour, IPointerEnterHandler, IPointerE
     private bool allowHover=true;
     private bool headphonesSelected = false;
     private bool shadesSelected = false;
+    private string[] countryList;
+    private int round; 
 
     void Start()
     {
@@ -23,6 +25,8 @@ public class ButtonToMapLinking : MonoBehaviour, IPointerEnterHandler, IPointerE
         activityStarted = activityManager.GetComponent<ActivityController>().activityStarted;
         headphonesSelected = activityManager.GetComponent<ActivityController>().headphonesSelected;
         shadesSelected = activityManager.GetComponent<ActivityController>().shadesSelected;
+        countryList = activityManager.GetComponent<ActivityController>().countryList;
+        round = activityManager.GetComponent<ActivityController>().round;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -31,12 +35,17 @@ public class ButtonToMapLinking : MonoBehaviour, IPointerEnterHandler, IPointerE
         activityStarted = activityManager.GetComponent<ActivityController>().activityStarted;
         headphonesSelected = activityManager.GetComponent<ActivityController>().headphonesSelected;
         shadesSelected = activityManager.GetComponent<ActivityController>().shadesSelected;
-
-        if (allowHover && activityStarted && !(headphonesSelected && shadesSelected))
+        round = activityManager.GetComponent<ActivityController>().round;
+        
+        //check if country round has passed 
+        bool isStillPending = CheckRoundPending(mapImage.sprite.name, round-1); 
+        // if the activity has started, headphones and shades are not selected, and the round is not over for this country  
+        if (allowHover && activityStarted && !(headphonesSelected && shadesSelected) && isStillPending)
         {
             mapImage.color = Color.blue;
         }
-        if(allowHover && activityStarted && headphonesSelected && shadesSelected)
+        // if the activity has started, headphones and shades are selected, and the round is not over for this country
+        if(allowHover && activityStarted && headphonesSelected && shadesSelected && isStillPending)
         {
             
             if (mapImage.sprite.name == countryName)
@@ -54,24 +63,46 @@ public class ButtonToMapLinking : MonoBehaviour, IPointerEnterHandler, IPointerE
     {
         countryName = activityManager.GetComponent<ActivityController>().selectedCountry;
         activityStarted = activityManager.GetComponent<ActivityController>().activityStarted;
+        round = activityManager.GetComponent<ActivityController>().round;
 
-        if (allowHover && activityStarted)
+        //check if country round has passed 
+        bool isStillPending = CheckRoundPending(mapImage.sprite.name, round-1); 
+        // default behaviour to when hover is exitted 
+        if (allowHover && activityStarted && isStillPending)
         {
             mapImage.color = Color.white;
+        }
+        // keep color green if mitigation tools are on and the country matches the selected country
+        if(mapImage.sprite.name == countryName && headphonesSelected && shadesSelected && isStillPending)
+        {
+            mapImage.color = Color.green;
         }
     }
 
     public void ColorOnSelect()
     {
+        round = activityManager.GetComponent<ActivityController>().round;
+
+        //check if country round has passed 
+        bool isStillPending = CheckRoundPending(mapImage.sprite.name, round-1); 
+
         //allow colour to change for a short time
-        StartCoroutine(CheckCountry());
+        if (isStillPending)
+        {
+            StartCoroutine(CheckCountry());
+        }
     }
 
+    /***********/
+    /* HELPERS */
+    /***********/
     private IEnumerator CheckCountry()
     {
         // if the country name matches the country for the activity
         countryName = activityManager.GetComponent<ActivityController>().selectedCountry;
         activityStarted = activityManager.GetComponent<ActivityController>().activityStarted;
+        round = activityManager.GetComponent<ActivityController>().round;
+
         if(activityStarted)
         {
             if (mapImage.sprite.name == countryName)
@@ -79,7 +110,7 @@ public class ButtonToMapLinking : MonoBehaviour, IPointerEnterHandler, IPointerE
                 // set image color to green and disable hover
                 mapImage.color = Color.green;
                 allowHover = false;
-                yield return null; //no need to wait 
+                yield return null;
             }
             else
             {
@@ -93,4 +124,21 @@ public class ButtonToMapLinking : MonoBehaviour, IPointerEnterHandler, IPointerE
 
         }
     }   
+
+    private bool CheckRoundPending(string country, int currentRound){
+        //account for cases where round has not started and so value is invalid 
+        if (currentRound < 0 || currentRound >= countryList.Length){
+            return false; 
+        }
+        for (int i = currentRound; i < countryList.Length; i++)
+        {
+            // Return true if country is found in the list of countries from this round
+            if (countryList[i] == country)
+            {
+                return true; 
+            }
+        }
+
+        return false; 
+    }
 }

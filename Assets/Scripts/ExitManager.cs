@@ -14,9 +14,4 @@ public class ExitManager : MonoBehaviour
         SceneManager.LoadScene(nextScene);
     }
 
-    public void selectQuit()
-    {
-        // Quit the application
-        Application.Quit();
-    }
 }

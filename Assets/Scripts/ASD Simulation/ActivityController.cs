@@ -13,7 +13,6 @@ public class ActivityController : MonoBehaviour
 
     // public variables that will be used in other scripts
     public bool activityStarted = false; 
-    public string selectedCountry; 
     
     //for ending game
     [SerializeField] GameObject fadeView; 
@@ -46,7 +45,9 @@ public class ActivityController : MonoBehaviour
     private bool lightsOn; 
 
     [Header("Country Map")]
-    [SerializeField] string[] countryList;
+    public string[] countryList;
+    public string selectedCountry; 
+    public int round =0; 
 
     [Header("Canvas")]
     [SerializeField] GameObject canvasTitle;
@@ -175,8 +176,8 @@ public class ActivityController : MonoBehaviour
         for (int i = 0; i < npcs.Length; i++)
         {
             npcs[i].transform.eulerAngles = npcTargetRotations[i];
-            PlayInnerMonologueAudioClip(1, loop: false);
         }
+        PlayInnerMonologueAudioClip(1, loop: false);
 
         //Start simulation for finding group
         yield return new WaitForSeconds(instructorAudioSource.clip.length/2);
@@ -282,6 +283,8 @@ public class ActivityController : MonoBehaviour
             selectedCountry = country;
             //update text on screen
             canvasItem.GetComponent<TextMeshProUGUI>().text = country;
+            //update round number
+            round++;
             //trigger select mitigation inner monologue until both mitigation tools are selected from the nth country
             if (country == countryList[4])
             {

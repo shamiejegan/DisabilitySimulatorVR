@@ -174,7 +174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 1}
+  m_Color: {r: 0.5582948, g: 0.9622642, b: 0.9622642, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -28330,7 +28330,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &477616590
 GameObject:
@@ -28374,7 +28374,7 @@ Transform:
   - {fileID: 92065166}
   - {fileID: 863921114}
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &479764400 stripped
 GameObject:
@@ -30711,7 +30711,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &644785589
 GameObject:
@@ -73066,7 +73066,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activityStarted: 0
-  selectedCountry: 
   fadeView: {fileID: 178886803}
   instructor: {fileID: 919132149540547808}
   instructorAudioClips:
@@ -73100,6 +73099,7 @@ MonoBehaviour:
   countryList:
   - Australia
   - Algeria
+  - Angola
   - Argentina
   - Brazil
   - Chad
@@ -73112,10 +73112,13 @@ MonoBehaviour:
   - Mexico
   - Turkey
   - Ukraine
+  - Kazakhstan
   - Mongolia
   - Philippines
   - SaudiArabia
   - SouthAfrica
+  selectedCountry: 
+  round: 0
   canvasTitle: {fileID: 378274801}
   canvasTimer: {fileID: 1987219314}
   canvasItem: {fileID: 163833480}
@@ -97692,8 +97695,9 @@ RectTransform:
   m_Children:
   - {fileID: 1306233531}
   - {fileID: 1134985717}
+  - {fileID: 543450653212620378}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -108746,9 +108750,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132149540547808}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 3.5, y: 0.072, z: 5.2}
-  m_LocalScale: {x: 1.2754564, y: 1.1431377, z: 1.2088381}
+  m_LocalRotation: {x: -0, y: 0.7071067, z: 0.7071068, w: 0}
+  m_LocalPosition: {x: 0.06326151, y: 0.020082008, z: -0.020171374}
+  m_LocalScale: {x: 0.027538326, y: 0.011959889, z: 0.012647268}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 541079050284060974}
@@ -108761,8 +108765,8 @@ Transform:
   - {fileID: 7027343502297369070}
   - {fileID: 4107946248613903715}
   - {fileID: 3249731390107558138}
-  m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_Father: {fileID: 2021047185}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!33 &572162336654760927
 MeshFilter:
