@@ -1,3 +1,6 @@
+# USING SOURCE CODE 
+* This project uses unity editor version 2021.3.30f1 
+
 # MEDIA CREDITS
 
 ## ICONS 
@@ -27,6 +30,12 @@ Sound Effect from Pixabay</a>
 * <a href="https://freesound.org/people/Psykophobia/sounds/608996/">Freesound - 5 min of crowd chatter. 40 people.wav by Psykophobia</a>
 
 ## 3D Assets  
-<a href="https://sketchfab.com/3d-models/university-lecture-hall-452cc01ebd1a47de9925bd43f44d7da4#download">"University Lecture Hall | 대학교 강의실 | 大学講義室" (https://skfb.ly/oAYsN) by 융해열흡수 is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).</a>
-<a href="https://sketchfab.com/3d-models/headset-68714ad096cc4d5b8a305a33374cf81b">Headset</a>
-<a href="https://sketchfab.com/3d-models/sunglasses-ef644e3ba9414b7997570a92857bee24">Sunglasses</a>
+* <a href="https://sketchfab.com/3d-models/university-lecture-hall-452cc01ebd1a47de9925bd43f44d7da4#download">"University Lecture Hall | 대학교 강의실 | 大学講義室" (https://skfb.ly/oAYsN) by 융해열흡수 is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).</a>
+* <a href="https://sketchfab.com/3d-models/headset-68714ad096cc4d5b8a305a33374cf81b">Headset</a>
+* <a href="https://sketchfab.com/3d-models/sunglasses-ef644e3ba9414b7997570a92857bee24">Sunglasses</a>
+
+## Character Models & Animations 
+* <a href="https://www.mixamo.com/#/">Joe (Instructor), adam, brian, bryce, david, elizabeth, jody, kate, lewis, louise, martha, megan, remy, shannon, sophie </a>
+
+## Country Map 
+* <a href="https://www.freepik.com/free-vector/blue-world-map-design_893721.htm#fromView=search&page=1&position=20&uuid=2c13c30d-d9da-4666-99f2-53861d1c6f5b">Map Image by Layerace on Freepik</a>
